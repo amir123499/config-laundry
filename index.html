@@ -1788,6 +1788,31 @@ $$('.vtab').forEach(b=>b.addEventListener('click',()=>{
 }));
 $('guideBack').addEventListener('click',()=>showView('tool'));
 
+/* ===== gist link cleaner (merged) ===== */
+const gInput=$('inputUrl'),gBox=$('resultBox'),gUrl=$('resultUrl'),gBadge=$('statusBadge'),gCopyB=$('copyBtn'),gDiff=$('diffBox');
+function gClean(){
+  let raw=gInput.value.trim();
+  if(!raw){gErr('لطفاً یک لینک وارد کن.');return;}
+  if(!/^https?:\/\//i.test(raw))raw='https://'+raw.replace(/^\/+/, '');
+  try{
+    const u=new URL(raw),host=u.hostname.toLowerCase();
+    if(!host.includes('githubusercontent.com')&&!host.includes('gist.github.com')){gErr('این لینک مربوط به GitHub Gist نیست.');return;}
+    const pat=/\/raw\/([a-f0-9]{7,40})(\/[^\/]*)?$/i,m=u.pathname.match(pat);
+    let changed=false,removed=null,path=u.pathname;
+    if(m){removed=m[1];path=u.pathname.replace(pat,'/raw'+(m[2]||''));changed=true;}
+    const out=u.protocol+'//'+u.host+path+u.search+u.hash;
+    gBox.hidden=false;gUrl.textContent=out;
+    gBadge.textContent=changed?'✓ hash حذف شد':'✓ لینک از قبل تمیز بود';
+    gDiff.textContent=changed?('حذف شده: /'+removed):'';
+    gDiff.hidden=!changed;
+    toast(changed?'hash حذف شد':'لینک از قبل تمیز بود');
+  }catch(e){gErr('لینک معتبر نیست. لطفاً یک URL کامل وارد کن.');}
+}
+function gErr(msg){
+  gBox.hidden=false;gUrl.textContent=msg;gBadge.textContent='✗ خطا';gDiff.hidden=true;toast(msg);
+}
+$('cleanBtn').addEventListener('click',gClean);
+$('clearBtn').addEventListener('click',()=>{gInput.value='';gBox.hidden=true;gUrl.textContent='';gDiff.hidden=true;});
 gCopyB.addEventListener('click',()=>{
   const t=gUrl.textContent;
   if(!t||/خطا|لطفاً/.test(t))return;
