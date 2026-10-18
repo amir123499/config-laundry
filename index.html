@@ -957,7 +957,7 @@ setTimeout(function(){
     <div class="vtabs" role="tablist" aria-label="بخش‌ها">
       <button class="vtab on" data-view="tool" aria-selected="true">ابزار</button>
       <button class="vtab" data-view="guide" aria-selected="false">راهنما</button>
-      <button class="vtab" data-view="cleaner" aria-selected="false">گیست</button>
+      
     </div>
   </div>
   <div class="wrap hrow2">
@@ -1238,31 +1238,7 @@ setTimeout(function(){
 
 </main>
 
-<main class="wrap" id="cleaner" hidden>
-  <div class="card">
-    <div class="ch"><h2>تمیزکننده لینک گیست</h2></div>
-    <p class="lead">hash کامیت را از لینک Raw حذف می‌کند تا همیشه آخرین نسخهٔ فایل را بدهد.</p>
-    <textarea id="inputUrl" class="ta" rows="3" dir="ltr" spellcheck="false" autocapitalize="off" placeholder="https://gist.githubusercontent.com/.../raw/..."></textarea>
-    <div class="acts">
-      <button class="btn pri" id="cleanBtn">پاک کردن لینک</button>
-      <button class="btn ghost" id="clearBtn">پاک کردن همه</button>
-    </div>
-    <div id="resultBox" class="preview" hidden>
-      <div class="ch"><span>نتیجه</span><span class="badge" id="statusBadge"></span></div>
-      <div class="code" id="resultUrl" dir="ltr"></div>
-      <div class="acts"><button class="btn soft sm" id="copyBtn">کپی لینک پاک‌شده</button></div>
-      <div class="muted" id="diffBox" hidden></div>
-    </div>
-    <details class="fold">
-      <summary>این ابزار چه می‌کند؟</summary>
-      <ul>
-        <li>لینک‌هایی که hash کامیت دارند را تشخیص می‌دهد.</li>
-        <li>قسمت hash را حذف می‌کند تا همیشه آخرین نسخه را بدهد.</li>
-        <li>اگر لینک از قبل تمیز باشد، همان را برمی‌گرداند.</li>
-      </ul>
-    </details>
-  </div>
-</main>
+
 
 <div id="toast"></div>
 
@@ -1775,8 +1751,8 @@ $('dl').onclick=()=>{
 };
 $('cpAll').onclick=()=>cp(allLinks(),'همه کپی شدند');
 $('sh').onclick=()=>navigator.share({text:allLinks()}).catch(()=>{});
-/* ===== merged views: tool / guide / cleaner ===== */
-const VIEWS=['tool','guide','cleaner'];
+/* ===== merged views: tool / guide ===== */
+const VIEWS=['tool','guide'];
 function showView(v){
   VIEWS.forEach(x=>{$(x).hidden=x!==v});
   $$('.vtab').forEach(b=>{const on=b.dataset.view===v;b.classList.toggle('on',on);b.setAttribute('aria-selected',String(on))});
@@ -1787,38 +1763,6 @@ $$('.vtab').forEach(b=>b.addEventListener('click',()=>{
   showView(b.classList.contains('on')&&v!=='tool'?'tool':v); /* tapping راهنما/گیست again exits */
 }));
 $('guideBack').addEventListener('click',()=>showView('tool'));
-
-/* ===== gist link cleaner (merged) ===== */
-const gInput=$('inputUrl'),gBox=$('resultBox'),gUrl=$('resultUrl'),gBadge=$('statusBadge'),gCopyB=$('copyBtn'),gDiff=$('diffBox');
-function gClean(){
-  let raw=gInput.value.trim();
-  if(!raw){gErr('لطفاً یک لینک وارد کن.');return;}
-  if(!/^https?:\/\//i.test(raw))raw='https://'+raw.replace(/^\/+/, '');
-  try{
-    const u=new URL(raw),host=u.hostname.toLowerCase();
-    if(!host.includes('githubusercontent.com')&&!host.includes('gist.github.com')){gErr('این لینک مربوط به GitHub Gist نیست.');return;}
-    const pat=/\/raw\/([a-f0-9]{7,40})(\/[^\/]*)?$/i,m=u.pathname.match(pat);
-    let changed=false,removed=null,path=u.pathname;
-    if(m){removed=m[1];path=u.pathname.replace(pat,'/raw'+(m[2]||''));changed=true;}
-    const out=u.protocol+'//'+u.host+path+u.search+u.hash;
-    gBox.hidden=false;gUrl.textContent=out;
-    gBadge.textContent=changed?'✓ hash حذف شد':'✓ لینک از قبل تمیز بود';
-    gDiff.textContent=changed?('حذف شده: /'+removed):'';
-    gDiff.hidden=!changed;
-    toast(changed?'hash حذف شد':'لینک از قبل تمیز بود');
-  }catch(e){gErr('لینک معتبر نیست. لطفاً یک URL کامل وارد کن.');}
-}
-function gErr(msg){
-  gBox.hidden=false;gUrl.textContent=msg;gBadge.textContent='✗ خطا';gDiff.hidden=true;toast(msg);
-}
-$('cleanBtn').addEventListener('click',gClean);
-$('clearBtn').addEventListener('click',()=>{gInput.value='';gBox.hidden=true;gUrl.textContent='';gDiff.hidden=true;});
-gCopyB.addEventListener('click',()=>{
-  const t=gUrl.textContent;
-  if(!t||/خطا|لطفاً/.test(t))return;
-  copyText(t);
-});
-gInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();gClean();}});
 
 const SCREENS=['in','res'];
 function showScreen(n){
