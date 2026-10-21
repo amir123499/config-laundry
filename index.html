@@ -1150,6 +1150,24 @@ setTimeout(function(){
       <li>در تب «ساخت کانفیگ» روش <b>ECH</b> را انتخاب کن. آی‌پی تمیز اختیاری است؛ اگر دادی، مثل <code data-c="188.114.97.6">188.114.97.6</code> استفاده می‌شود.</li>
       <li>لینک‌ها را از «همه در یک کادر» کپی کن و در PattNG از Import from clipboard وارد کن.</li>
       <li>روی هر کانفیگ مداد را بزن و چک کن: finalMask <b>خالی</b>، cipherSuites <b>خالی</b>، fingerprint = <code data-c="chrome">chrome</code>، echConfigList = <code data-c="cloudflare-ech.com+h2c://1.1.1.1/dns-query">cloudflare-ech.com+h2c://1.1.1.1/dns-query</code>.</li>
+      <li>طبق پیام جدید Patt، برای گرفتن کلید ECH بدون plain DNS این outbound را هم <b>یک‌بار</b> به تنظیمات PattNG/PattN اضافه کن (از نسخه PattNG ‏P67‏ و PattN ‏P34‏ به بعد):
+      <textarea class="ta" rows="10" readonly onclick="this.select()" id="echob">{
+  "tag": "tls-repack-dns",
+  "protocol": "direct",
+  "settings": {
+    "redirect": "1.1.1.1:443"
+  },
+  "streamSettings": {
+    "security": "tls",
+    "tlsSettings": {
+      "serverName": "www.microsoft.com",
+      "verifyPeerCertByName": "fromMitM,www.microsoft.com",
+      "alpn": ["fromMitM"],
+      "fingerprint": "chrome"
+    }
+  }
+}</textarea>
+      <div class="row"><button class="btn ghost sm" id="cpEchOb">کپی JSON</button></div></li>
       <li>ذخیره کن و وصل شو.</li>
     </ol>
   </section>
@@ -1750,6 +1768,7 @@ $('dl').onclick=()=>{
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
 };
 $('cpAll').onclick=()=>cp(allLinks(),'همه کپی شدند');
+$('cpEchOb').onclick=()=>cp($('echob').value.trim(),'کپی شد');
 $('sh').onclick=()=>navigator.share({text:allLinks()}).catch(()=>{});
 /* ===== merged views: tool / guide ===== */
 const VIEWS=['tool','guide'];
