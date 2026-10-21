@@ -1101,6 +1101,7 @@ setTimeout(function(){
       <div class="row"><input class="inp" id="fmv"><button class="btn ghost sm" id="rfm">پیش‌فرض</button></div>
       <label class="fld">echConfigList (روش ECH)</label>
       <div class="row"><input class="inp" id="echv" list="echpresets"><datalist id="echpresets"><option value="cloudflare-ech.com+h2c://1.1.1.1/dns-query"></option><option value="cloudflare-ech.com+https://8.8.8.8/dns-query"></option><option value="crypto.cloudflare.com+udp://1.1.1.1"></option></datalist><button class="btn ghost sm" id="pech">پیست</button><button class="btn ghost sm" id="rech">پیش‌فرض</button></div>
+      <label class="sw"><input type="checkbox" id="echOb"><span>افزودن echOutbound به لینک‌های ECH</span></label>
       <p class="muted">cipherSuites داخل لینک منتقل نمی‌شود؛ مقدارش در کارت روش‌ها هست و باید داخل اپ دستی گذاشته شود.</p>
       <div class="acts"><button class="btn ghost sm" id="resetAll">بازگردانی همه تنظیمات</button></div>
     </details>
@@ -1271,6 +1272,7 @@ const clone=o=>JSON.parse(JSON.stringify(o));
 const DEF_FM='tlshello-0-len';
 const SEMI='semi-python';
 const ECH_DEF='cloudflare-ech.com+h2c://1.1.1.1/dns-query';
+const ECH_OB=JSON.stringify({tag:"tls-repack-dns",protocol:"direct",settings:{redirect:"1.1.1.1:443"},streamSettings:{security:"tls",tlsSettings:{serverName:"www.microsoft.com",verifyPeerCertByName:"fromMitM,www.microsoft.com",alpn:["fromMitM"],fingerprint:"chrome"}}});
 const CIPHERS='TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256';
 const CF4=[["173.245.48.0",20],["103.21.244.0",22],["103.22.200.0",22],["103.31.4.0",22],["141.101.64.0",18],["108.162.192.0",18],["190.93.240.0",20],["188.114.96.0",20],["197.234.240.0",22],["198.41.128.0",17],["162.158.0.0",15],["104.16.0.0",13],["104.24.0.0",14],["172.64.0.0",13],["131.0.72.0",22]];
 const CF6=['2606:4700:','2803:f800:','2405:b500:','2405:8100:','2a06:98c','2c0f:f248:'];
@@ -1293,7 +1295,7 @@ const METHODS={
 };
 /* method starts empty — user must pick one */
 const DEF={method:'',mixOn:false,mix2:'pl',flip:false,v6f:false,mode:'rotate',ips:'',px:'',
-  fm:DEF_FM,ech:ECH_DEF,tagMethod:true,tagIp:true,custom:false,sep:'-',
+  fm:DEF_FM,ech:ECH_DEF,echOb:true,tagMethod:true,tagIp:true,custom:false,sep:'-',
   labels:{ff:'FF',ech:'ECH',v6:'V6',pl:'',px:'PX'},outSep:'nl',dedupe:true,sortBy:'orig',ui:'aurora',accent:'teal'};
 let S=clone(DEF);
 let R=[];
@@ -1486,7 +1488,7 @@ function applyMethod(cfg,m,RS){
     if(type==='ws')qset(q,'alpn','http/1.1');
     else if(type==='xhttp'||type==='splithttp')qset(q,'alpn','h2,http/1.1');
   }
-  if(m==='ech'){qset(q,'fp','chrome');qset(q,'ech',RS.ech)}
+  if(m==='ech'){qset(q,'fp','chrome');qset(q,'ech',RS.ech);if(RS.echOb)qset(q,'echOutbound',ECH_OB)}
   if(m==='v6'){qset(q,'fp','chrome');if(RS.v6f)qset(q,'fm',RS.fm)}
   if(m==='px'){
     const tp=(qget(q,'type')||'tcp').toLowerCase();
@@ -1535,7 +1537,7 @@ function readUI(){
   S.method=ch?ch.value:'';
   S.mixOn=$('mixOn').checked;S.mix2=$('mix2').value;S.flip=$('flip').checked;S.v6f=$('v6f').checked;
   S.mode=$('mode').value;S.ips=$('ips').value;S.px=$('pxip').value.trim();
-  S.fm=$('fmv').value.trim()||DEF_FM;S.ech=$('echv').value.trim()||ECH_DEF;
+  S.fm=$('fmv').value.trim()||DEF_FM;S.ech=$('echv').value.trim()||ECH_DEF;S.echOb=$('echOb').checked;
   S.tagMethod=$('tagMethod').checked;S.tagIp=$('tagIp').checked;S.custom=$('custom').checked;S.sep=$('sep').value;
   MK.forEach(k=>{S.labels[k]=$('lab_'+k).value});
   S.outSep=$('outSep').value;S.dedupe=$('dedupe').checked;S.sortBy=$('sortBy').value;
@@ -1547,7 +1549,7 @@ function writeUI(){
     r.parentElement.classList.toggle('on',r.checked);
   });
   $('mixOn').checked=S.mixOn;$('mix2').value=S.mix2;$('flip').checked=S.flip;$('v6f').checked=S.v6f;
-  $('mode').value=S.mode;$('ips').value=S.ips;$('pxip').value=S.px;$('fmv').value=S.fm;$('echv').value=S.ech;
+  $('mode').value=S.mode;$('ips').value=S.ips;$('pxip').value=S.px;$('fmv').value=S.fm;$('echv').value=S.ech;$('echOb').checked=S.echOb!==false;
   $('tagMethod').checked=S.tagMethod;$('tagIp').checked=S.tagIp;$('custom').checked=S.custom;$('sep').value=S.sep;
   MK.forEach(k=>{$('lab_'+k).value=S.labels[k]||''});
   $('outSep').value=S.outSep;$('dedupe').checked=S.dedupe;$('sortBy').value=S.sortBy;
