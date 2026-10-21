@@ -1100,7 +1100,7 @@ setTimeout(function(){
       <label class="fld">finalMask (روش Fragment و IPv6 با فیلتر)</label>
       <div class="row"><input class="inp" id="fmv"><button class="btn ghost sm" id="rfm">پیش‌فرض</button></div>
       <label class="fld">echConfigList (روش ECH)</label>
-      <div class="row"><input class="inp" id="echv"><button class="btn ghost sm" id="pech">پیست</button><button class="btn ghost sm" id="rech">پیش‌فرض</button></div>
+      <div class="row"><input class="inp" id="echv" list="echpresets"><datalist id="echpresets"><option value="cloudflare-ech.com+h2c://1.1.1.1/dns-query"></option><option value="cloudflare-ech.com+https://8.8.8.8/dns-query"></option><option value="crypto.cloudflare.com+udp://1.1.1.1"></option></datalist><button class="btn ghost sm" id="pech">پیست</button><button class="btn ghost sm" id="rech">پیش‌فرض</button></div>
       <p class="muted">cipherSuites داخل لینک منتقل نمی‌شود؛ مقدارش در کارت روش‌ها هست و باید داخل اپ دستی گذاشته شود.</p>
       <div class="acts"><button class="btn ghost sm" id="resetAll">بازگردانی همه تنظیمات</button></div>
     </details>
@@ -1149,7 +1149,7 @@ setTimeout(function(){
     <ol>
       <li>در تب «ساخت کانفیگ» روش <b>ECH</b> را انتخاب کن. آی‌پی تمیز اختیاری است؛ اگر دادی، مثل <code data-c="188.114.97.6">188.114.97.6</code> استفاده می‌شود.</li>
       <li>لینک‌ها را از «همه در یک کادر» کپی کن و در PattNG از Import from clipboard وارد کن.</li>
-      <li>روی هر کانفیگ مداد را بزن و چک کن: finalMask <b>خالی</b>، cipherSuites <b>خالی</b>، fingerprint = <code data-c="chrome">chrome</code>، echConfigList = <code data-c="cloudflare-ech.com+udp://1.1.1.1">cloudflare-ech.com+udp://1.1.1.1</code>.</li>
+      <li>روی هر کانفیگ مداد را بزن و چک کن: finalMask <b>خالی</b>، cipherSuites <b>خالی</b>، fingerprint = <code data-c="chrome">chrome</code>، echConfigList = <code data-c="cloudflare-ech.com+h2c://1.1.1.1/dns-query">cloudflare-ech.com+h2c://1.1.1.1/dns-query</code>.</li>
       <li>ذخیره کن و وصل شو.</li>
     </ol>
   </section>
@@ -1205,7 +1205,7 @@ setTimeout(function(){
   <section class="card gd">
     <div class="card-h"><span class="num">۷</span><h2>دامنه‌های railway.app و دامنه‌های رایگان</h2></div>
     <ol>
-      <li><b>ECH:</b> مقدار echConfigList = <code data-c="cloudflare-ech.com+udp://1.1.1.1">cloudflare-ech.com+udp://1.1.1.1</code>. همان روش ECH همین ابزار.</li>
+      <li><b>ECH:</b> مقدار echConfigList = <code data-c="cloudflare-ech.com+h2c://1.1.1.1/dns-query">cloudflare-ech.com+h2c://1.1.1.1/dns-query</code>. همان روش ECH همین ابزار.</li>
       <li><b>finalMask + fingerprint:</b> مقدارهای این روش در پست کانال SPiDER_VPN1 به شماره ۱۰۸۵ آمده (<code data-c="https://t.me/SPiDER_VPN1/1085">t.me/SPiDER_VPN1/1085</code>). این پست را من باز نکردم؛ مقدارهایش را با مقدارهای Fragment همین ابزار مقایسه کن.</li>
       <li><b>SNI spoof</b> با fake sni = <code data-c="auth.vercel.com">auth.vercel.com</code> و آی‌پی = <code data-c="188.114.96.7">188.114.96.7</code>: این با تغییر لینک انجام نمی‌شود و نیاز به هستهٔ SNISPF دارد، پس داخل این ابزار نیست. برای پیدا کردن جفت SNI و آی‌پی سالم از <b>NaxonM/SNI-Finder</b> استفاده کن. این اسکنر برای ویندوز و لینوکس است؛ اسمش را توی گوگل یا گیت‌هاب بزن.</li>
     </ol>
@@ -1252,7 +1252,7 @@ const safeDec=s=>{try{return decodeURIComponent(s)}catch(e){return s}};
 const clone=o=>JSON.parse(JSON.stringify(o));
 const DEF_FM='tlshello-0-len';
 const SEMI='semi-python';
-const ECH_DEF='cloudflare-ech.com+udp://1.1.1.1';
+const ECH_DEF='cloudflare-ech.com+h2c://1.1.1.1/dns-query';
 const CIPHERS='TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256';
 const CF4=[["173.245.48.0",20],["103.21.244.0",22],["103.22.200.0",22],["103.31.4.0",22],["141.101.64.0",18],["108.162.192.0",18],["190.93.240.0",20],["188.114.96.0",20],["197.234.240.0",22],["198.41.128.0",17],["162.158.0.0",15],["104.16.0.0",13],["104.24.0.0",14],["172.64.0.0",13],["131.0.72.0",22]];
 const CF6=['2606:4700:','2803:f800:','2405:b500:','2405:8100:','2a06:98c','2c0f:f248:'];
